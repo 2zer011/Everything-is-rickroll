@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101014">
+<title>every is rickroll</title>
+<style>
+:root{color-scheme:dark;--bg:#101014;--panel:#1a1a22;--line:#343440;--text:#f4f4f7;--muted:#a6a6b3;--pink:#ff4f87}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0,#292036 0,var(--bg) 58%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;display:grid;place-items:center;padding:24px}
+main{width:min(100%,650px)}
+header{text-align:center;margin-bottom:24px}
+h1{font-size:clamp(2rem,8vw,3.3rem);line-height:1.05;letter-spacing:-.06em;margin:0 0 10px}
+h1 span{color:var(--pink)}
+.sub{color:var(--muted);margin:0}
+.panel{background:color-mix(in srgb,var(--panel) 94%,transparent);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 18px 60px #0006}
+label{display:block;font-weight:650;margin:0 0 8px}
+textarea{width:100%;min-height:105px;resize:vertical;background:#101016;border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--text);font:inherit;outline:none}
+textarea:focus,.drop:focus-within{border-color:var(--pink)}
+.drop{border:1.5px dashed #555565;border-radius:14px;padding:22px;text-align:center;background:#111118;cursor:pointer;transition:.2s}
+.drop.over{border-color:var(--pink);background:#241722}
+.drop strong{display:block}
+.drop small{color:var(--muted)}
+input[type=file]{display:none}
+#fileName{display:block;color:var(--muted);font-size:.9rem;margin-top:8px;overflow-wrap:anywhere}
+.preview{display:none;margin-top:14px}
+.preview img{display:block;max-width:100%;max-height:260px;object-fit:contain;margin:auto;border-radius:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button{border:0;border-radius:11px;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer}
+.primary{background:var(--pink);color:#190b11;flex:1}
+.secondary{background:#2b2b36;color:var(--text)}
+button:disabled{opacity:.45;cursor:not-allowed}
+#result{display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+#shareUrl{width:100%;padding:12px;border-radius:10px;background:#101016;border:1px solid var(--line);color:#dcdce5;overflow-wrap:anywhere;word-break:break-all;font-size:.9rem}
+.note{font-size:.82rem;color:var(--muted);margin:12px 0 0}
+.error{color:#ff9aaf;font-size:.9rem;margin-top:10px;min-height:1.3em}
+.viewer{width:min(100%,720px);text-align:center}
+.viewer-card{cursor:pointer;user-select:none;background:#1a1a22;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 18px 60px #0007}
+.viewer-card img{max-width:100%;max-height:58vh;object-fit:contain;border-radius:12px}
+.viewer-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:clamp(1.1rem,4vw,1.6rem);margin:16px 0}
+.tap{color:var(--pink);font-weight:800;margin:14px 0 0}
+.badge{font-size:.72rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<main id="creator">
+  <header>
+    <h1>every is <span>rickroll</span></h1>
+    <p class="sub">Biến bất kỳ tấm ảnh và dòng chữ nào thành một cú Rickroll.</p>
+  </header>
+  <section class="panel">
+    <label for="userText">Text của bạn</label>
+    <textarea id="userText" maxlength="1200" placeholder="Nhập một dòng nhắn, caption hoặc bất cứ thứ gì..."></textarea>
+    <div style="height:18px"></div>
+    <label>Ảnh của bạn (không bắt buộc)</label>
+    <label class="drop" id="dropZone" for="imageInput" tabindex="0">
+      <strong>Thả ảnh vào đây hoặc nhấn để chọn</strong>
+      <small>JPG, PNG, GIF, WEBP — ảnh sẽ được thu nhỏ để link nhẹ hơn</small>
+      <input id="imageInput" type="file" accept="image/*">
+      <span id="fileName">Chưa chọn ảnh</span>
+    </label>
+    <div class="preview" id="preview"><img id="previewImg" alt="Ảnh xem trước"></div>
+    <div class="actions">
+      <button class="primary" id="createBtn">Tạo link Rickroll</button>
+      <button class="secondary" id="clearBtn" type="button">Xóa</button>
+    </div>
+    <div class="error" id="error" role="status"></div>
+    <div id="result">
+      <label>Link chia sẻ</label>
+      <div id="shareUrl"></div>
+      <div class="actions">
+        <button class="primary" id="copyBtn" type="button">Copy link</button>
+        <button class="secondary" id="openBtn" type="button">Mở thử</button>
+      </div>
+      <p class="note">Người nhận sẽ thấy nội dung bạn tạo. Khi họ nhấn vào thẻ nội dung, YouTube sẽ mở video Rick Astley.</p>
+    </div>
+  </section>
+  <p class="note" style="text-align:center">Mẹo: link chứa dữ liệu ảnh và text ngay trong URL, không cần máy chủ lưu trữ.</p>
+</main>
+
+<main id="viewer" class="viewer hidden">
+  <header>
+    <h1>every is <span>rickroll</span></h1>
+    <p class="sub">Một nội dung vừa được gửi cho bạn.</p>
+  </header>
+  <div class="viewer-card" id="rickCard" role="button" tabindex="0" aria-label="Nhấn để mở nội dung">
+    <div class="badge">A message for you</div>
+    <img id="sharedImg" class="hidden" alt="Ảnh được chia sẻ">
+    <div id="sharedText" class="viewer-text"></div>
+    <div class="tap">NHẤN ĐỂ MỞ ↗</div>
+  </div>
+  <p class="note">Nhấn vào thẻ để mở nội dung trên YouTube.</p>
+</main>
+<script>
+(() => {
+  const RICKROLL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+  const $ = id => document.getElementById(id);
+  let imageData = '';
+  let imageFileName = '';
+
+  function setError(message=''){ $('error').textContent = message; }
+  function showImage(data, name='Ảnh đã chọn'){
+    imageData = data || '';
+    imageFileName = name;
+    $('fileName').textContent = data ? name : 'Chưa chọn ảnh';
+    $('preview').style.display = data ? 'block' : 'none';
+    if(data) $('previewImg').src = data;
+  }
+  function processFile(file){
+    if(!file) return;
+    if(!file.type.startsWith('image/')) { setError('Vui lòng chọn một tệp ảnh.'); return; }
+    setError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 900;
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        showImage(canvas.toDataURL('image/jpeg', .72), file.name);
+      };
+      img.onerror = () => setError('Không đọc được ảnh này.');
+      img.src = reader.result;
+    };
+    reader.onerror = () => setError('Không thể đọc tệp ảnh.');
+    reader.readAsDataURL(file);
+  }
+
+  $('imageInput').addEventListener('change', e => processFile(e.target.files[0]));
+  const dz = $('dropZone');
+  ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => {e.preventDefault(); dz.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => {e.preventDefault(); dz.classList.remove('over');}));
+  dz.addEventListener('drop', e => processFile(e.dataTransfer.files[0]));
+  dz.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();$('imageInput').click();} });
+
+  function base64UrlEncode(str){
+    const bytes = new TextEncoder().encode(str);
+    let binary = '';
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  function base64UrlDecode(str){
+    str = str.replace(/-/g,'+').replace(/_/g,'/');
+    while(str.length % 4) str += '=';
+    const binary = atob(str);
+    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+  function makeLink(){
+    const payload = {t:$('userText').value, i:imageData};
+    const encoded = base64UrlEncode(JSON.stringify(payload));
+    return location.href.split('#')[0] + '#share=' + encoded;
+  }
+  $('createBtn').addEventListener('click', () => {
+    setError('');
+    if(!$('userText').value.trim() && !imageData){setError('Hãy thêm ít nhất một dòng text hoặc một ảnh.');return;}
+    const link = makeLink();
+    if(link.length > 1800000){setError('Ảnh vẫn quá lớn. Hãy chọn ảnh có dung lượng nhỏ hơn.');return;}
+    $('shareUrl').textContent = link;
+    $('result').style.display = 'block';
+  });
+  $('copyBtn').addEventListener('click', async () => {
+    const link = $('shareUrl').textContent;
+    try { await navigator.clipboard.writeText(link); $('copyBtn').textContent='Đã copy!'; }
+    catch { setError('Không copy tự động được. Hãy nhấn giữ link để sao chép.'); }
+  });
+  $('openBtn').addEventListener('click', () => window.open($('shareUrl').textContent, '_blank', 'noopener'));
+  $('clearBtn').addEventListener('click', () => {
+    $('userText').value=''; $('imageInput').value=''; showImage(''); $('result').style.display='none'; setError('');
+  });
+
+  function openRickroll(){ window.location.assign(RICKROLL); }
+  $('rickCard').addEventListener('click', openRickroll);
+  $('rickCard').addEventListener('keydown', e => {if(e.key==='Enter'||e.key===' '){e.preventDefault();openRickroll();}});
+
+  const match = location.hash.match(/^#share=(.+)$/);
+  if(match){
+    try {
+      const data = JSON.parse(base64UrlDecode(match[1]));
+      if(typeof data.t !== 'string' || typeof data.i !== 'string') throw new Error('invalid');
+      $('creator').classList.add('hidden');
+      $('viewer').classList.remove('hidden');
+      $('sharedText').textContent = data.t;
+      if(data.i){$('sharedImg').src=data.i;$('sharedImg').classList.remove('hidden');}
+      if(!data.t && !data.i) $('sharedText').textContent='Bạn có một bất ngờ!';
+    } catch {
+      setError('Link chia sẻ không hợp lệ hoặc đã bị cắt bớt.');
+    }
+  }
+})();
+</script>
+</body>
+</html>
